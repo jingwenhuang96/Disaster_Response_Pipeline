@@ -26,11 +26,11 @@ def tokenize(text):
     return clean_tokens
 
 # load data
-engine = create_engine('sqlite:///../data/YourDatabaseName.db')
-df = pd.read_sql_table('YourTableName', engine)
+engine = create_engine('sqlite:///data/DisasterResponse.db')
+df = pd.read_sql_table('table', engine)
 
 # load model
-model = joblib.load("../models/your_model_name.pkl")
+model = joblib.load("models/classifier.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model
@@ -51,16 +51,22 @@ def index():
                 Bar(
                     x=genre_names,
                     y=genre_counts
-                )
-            ],
-
+                ),
+            ],    
             'layout': {
                 'title': 'Distribution of Message Genres',
+                'font':{
+                    'family': 'Raleway, sans-serif'
+                },
+
+                'showlegend': 'false',
                 'yaxis': {
-                    'title': "Count"
+                    'title': "Frequency",
+                    'gridwidth': 2,
+                    'zeroline': 'false'
                 },
                 'xaxis': {
-                    'title': "Genre"
+                    'title': "Genre Type"
                 }
             }
         }
