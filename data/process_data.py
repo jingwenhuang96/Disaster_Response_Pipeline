@@ -3,12 +3,27 @@ from sqlalchemy import create_engine
 import pandas as pd
 
 def load_data(messages_filepath, categories_filepath):
+    """
+    This function is to load the messages and categories of dataset and merge these two dataframe to one dataframe
+    Input:
+    messages_filepath: filepath that contains messages
+    categories_filepath: filepath that contains categories
+    Output:
+    df: the merged file of messages and categories file, the merge key is id, the merge method is outer
+    """
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     df = pd.merge(categories, messages, on='id',  how='outer')
     return df
 
 def clean_data(df):
+    """
+    This function is to clean the data and prepare the data with the format that can use for machine learning
+    Input:
+    df: merged dataframe that is outputed through the function 'load_data()'
+    Output:
+    df_new: cleaned dataframe without duplicates, with categories explode in 36 columns
+    """
     categories = df['categories'].str.split(';', expand = True)
     # select the first row of the categories dataframe
     row = categories.iloc[0]
@@ -27,6 +42,14 @@ def clean_data(df):
     return df_new
     
 def save_data(df, database_filename):
+    """
+    This function is to export the cleaned dataset into a SQL database
+    Input:
+    df: the dataset we want to export
+    database_filename: the name we name this export dataset
+    Output:
+    None
+    """
     engine = create_engine("sqlite:///{}".format(database_filename))
     df.to_sql('table', engine, index=False)
     pass  
