@@ -1,3 +1,4 @@
+# the run.py works as a combination of route.py and _init_.py
 import json
 import plotly
 import pandas as pd
@@ -5,14 +6,14 @@ import pandas as pd
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
-from flask import Flask
+from flask import Flask # import flask library
 from flask import render_template, request, jsonify
 from plotly.graph_objs import Bar
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
 
 
-app = Flask(__name__)
+app = Flask(__name__) # create a variable called app
 
 def tokenize(text):
     tokens = word_tokenize(text)
@@ -42,9 +43,12 @@ def index():
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
+    Related_counts_per_genre = df.groupby('genre').sum()['related']
+    Request_counts_per_genre = df.groupby('genre').sum()['request']
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
+
     graphs = [
         {
             'data': [
@@ -61,7 +65,55 @@ def index():
 
                 'showlegend': 'false',
                 'yaxis': {
-                    'title': "Frequency",
+                    'title': "Frequency of Genre Type",
+                    'gridwidth': 2,
+                    'zeroline': 'false'
+                },
+                'xaxis': {
+                    'title': "Genre Type"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=genre_names,
+                    y=Related_counts_per_genre
+                ),
+            ],    
+            'layout': {
+                'title': 'Distribution of Related Message per Genres',
+                'font':{
+                    'family': 'Raleway, sans-serif'
+                },
+
+                'showlegend': 'false',
+                'yaxis': {
+                    'title': "Frequency of Related Message",
+                    'gridwidth': 2,
+                    'zeroline': 'false'
+                },
+                'xaxis': {
+                    'title': "Genre Type"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=genre_names,
+                    y=Request_counts_per_genre
+                ),
+            ],    
+            'layout': {
+                'title': 'Distribution of Request Message per Genres',
+                'font':{
+                    'family': 'Raleway, sans-serif'
+                },
+
+                'showlegend': 'false',
+                'yaxis': {
+                    'title': "Frequency of Request Message",
                     'gridwidth': 2,
                     'zeroline': 'false'
                 },
@@ -73,11 +125,14 @@ def index():
     ]
     
     # encode plotly graphs in JSON
+    # ids is a list containing the distinct id for each plot
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
+    # graphJason contains a dictionary of graphs and transform it with a plotly format that Json can decode
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
     
-    # render web page with plotly graphs
+    # render specific web page with plotly graphs
     return render_template('master.html', ids=ids, graphJSON=graphJSON)
+
 
 
 # web page that handles user query and displays model results
