@@ -53,6 +53,8 @@ def tokenize(message):
     Input: raw text massages 
     Output: the tokenized the text words in a list
     """
+    # remove special characters and lowercase
+    message = re.sub(r"[^a-zA-Z0-9]", " ", message.lower())
     # Identify any urls in text, and replace each one with the word, "urlplaceholder"
     url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
     detected_urls = re.findall(url_regex, message)
